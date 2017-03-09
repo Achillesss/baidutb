@@ -1,2 +1,2 @@
-# baidutb
-baidu tieba sign
+#baidutb
+for baidu tieba signing
