@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 
-	"github.com/Achillesss/baidutb/client"
+	"github.com/achillesss/baidutb/client"
 )
 
 var path = flag.String("c", "./config/conf.toml", "config")
