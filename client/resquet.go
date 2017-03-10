@@ -48,6 +48,6 @@ func (a *agent) signUp() time.Time {
 	if res.ErrMsg != "" {
 		desc = res.ErrMsg
 	}
-	log.Printf("sign %q end.Resposne: %#v\n", a.Kw, desc)
-	return time.Unix(1489168392, 0)
+	log.Printf("sign %q end.Resp: %#v", a.Kw, desc)
+	return time.Unix(res.Time, 0)
 }
