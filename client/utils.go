@@ -1,13 +1,11 @@
 package client
 
 import (
+	"crypto/md5"
 	"encoding/json"
+	"fmt"
 	"regexp"
 	"time"
-
-	"fmt"
-
-	"crypto/md5"
 
 	"github.com/achillesss/baidutb/config"
 	"github.com/achillesss/log"

@@ -2,13 +2,11 @@ package client
 
 import (
 	"fmt"
-
-	log "github.com/achillesss/log"
+	"time"
 
 	"encoding/json"
 
-	"time"
-
+	log "github.com/achillesss/log"
 	req "github.com/parnurzeal/gorequest"
 )
 
