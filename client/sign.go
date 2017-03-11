@@ -10,6 +10,7 @@ import (
 var timeChan chan *time.Time
 
 func Start(path string) {
+	signCount := make(map[string]int)
 	for {
 		c := new(config.C)
 		c.Decode(path)
@@ -23,6 +24,7 @@ func Start(path string) {
 				a.configurate(c).checkConf().log()
 				a.signOnePerson(bduss)
 			}(b)
+			signCount[b]++
 		}
 
 		select {
@@ -47,6 +49,9 @@ func Start(path string) {
 
 		sleepTime := tomorrow(*signTime).Sub(*signTime)
 		log.Printfln("Today's signing ended at %s. tomorrow's signing begins at%s. sleep time: %v s", signTime.Format(time.RFC3339), tomorrow(*signTime), sleepTime.Seconds())
+		for k, v := range signCount {
+			log.Printfln("signing count: %d\taccount: %q", v, k[:10])
+		}
 		time.Sleep(sleepTime)
 	}
 }
