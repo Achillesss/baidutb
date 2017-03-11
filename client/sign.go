@@ -8,12 +8,11 @@ import (
 )
 
 func Start(path string) {
-	c := new(config.C)
-	c.Decode(path)
-	a := new(agent)
-	a.configurate(c).checkConf().log()
-	// a.debug = true
 	for {
+		c := new(config.C)
+		c.Decode(path)
+		a := new(agent)
+		a.configurate(c).checkConf().log()
 		var signTime *time.Time
 		for _, b := range a.BdussList {
 			fmt.Printf("\nSigning %s\n", b)
