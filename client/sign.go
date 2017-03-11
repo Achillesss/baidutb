@@ -13,19 +13,23 @@ func Start(path string) {
 	a := new(agent)
 	a.configurate(c).checkConf().log()
 	// a.debug = true
-	a.getList().parseListResp()
 	for {
 		var signTime *time.Time
-		for k := range a.KwList {
-			fmt.Printf("\n")
-			a.Kw = k
-			if a.err == nil {
-				if a.getFid().parseFidResp().getTbs().parseTbsResp().canSign() {
-					now := a.sign().signUp()
-					if signTime == nil {
-						signTime = &now
+		for _, b := range a.BdussList {
+			fmt.Printf("\nSigning %s\n", b)
+			a.setBduss(b)
+			a.getList().parseListResp()
+			for k := range a.KwList {
+				fmt.Printf("\n")
+				a.Kw = k
+				if a.err == nil {
+					if a.getFid().parseFidResp().getTbs().parseTbsResp().canSign() {
+						now := a.sign().signUp()
+						if signTime == nil {
+							signTime = &now
+						}
+						fmt.Printf("Time: %s\n", now.Format(time.RFC3339))
 					}
-					fmt.Printf("Time: %s\n", now.Format(time.RFC3339))
 				}
 			}
 		}

@@ -13,11 +13,12 @@ type agent struct {
 }
 
 type tiebaConf struct {
-	fidURL  string
-	tbsURL  string
-	SignURL string
-	ListURL string
-	KwList  map[string]string
+	fidURL    string
+	tbsURL    string
+	SignURL   string
+	ListURL   string
+	BdussList []string
+	KwList    map[string]string
 }
 type tiebaBody struct {
 	Bduss string `json:"BDUSS"`

@@ -11,12 +11,16 @@ import (
 	"github.com/achillesss/log"
 )
 
+func (a *agent) setBduss(bduss string) *agent {
+	a.tiebaBody.Bduss = bduss
+	return a
+}
 func (a *agent) configurate(c *config.C) *agent {
 	a.tiebaConf.ListURL = c.ListURL
 	a.tiebaConf.fidURL = c.FidURL
 	a.tiebaConf.SignURL = c.SignURL
 	a.tiebaConf.tbsURL = c.TbsURL
-	a.tiebaBody.Bduss = c.Bduss
+	a.tiebaConf.BdussList = c.BdussList
 	return a
 }
 
@@ -37,8 +41,8 @@ func (a *agent) checkConf() *agent {
 		a.err = fmt.Errorf("nil tbs url")
 	case a.SignURL == "":
 		a.err = fmt.Errorf("nil sign url")
-	case a.Bduss == "":
-		a.err = fmt.Errorf("nil bduss")
+	case a.BdussList == nil:
+		a.err = fmt.Errorf("nil bduss list")
 	}
 	return a
 }
