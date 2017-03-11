@@ -108,6 +108,7 @@ func (a *agent) canSign() bool {
 	}
 	return a.err == nil
 }
+
 func (a *agent) sign(kw string) *agent {
 	a.Sign = fmt.Sprintf("%X", md5.Sum([]byte(fmt.Sprintf("BDUSS=%sfid=%skw=%stbs=%stiebaclient!!!", a.Bduss, a.Fid, kw, a.Tbs))))
 	return a
@@ -115,4 +116,18 @@ func (a *agent) sign(kw string) *agent {
 
 func tomorrow(now time.Time) time.Time {
 	return time.Date(now.Year(), now.Month(), now.Day()+1, 0, 0, 0, 500000000, now.Location())
+}
+
+func transBdussChan(bdussChan chan<- string, bdussList []string) {
+	for _, b := range bdussList {
+		bdussChan <- b
+	}
+	close(bdussChan)
+}
+
+func transKwChan(kwChan chan<- string, kwList map[string]string) {
+	for k := range kwList {
+		kwChan <- k
+	}
+	close(kwChan)
 }

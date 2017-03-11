@@ -64,20 +64,6 @@ func (a *agent) signOneTieba(kw string) {
 	}
 }
 
-func transBdussChan(bdussChan chan<- string, bdussList []string) {
-	for _, b := range bdussList {
-		bdussChan <- b
-	}
-	close(bdussChan)
-}
-
-func transKwChan(kwChan chan<- string, kwList map[string]string) {
-	for k := range kwList {
-		kwChan <- k
-	}
-	close(kwChan)
-}
-
 func (a *agent) signOnePerson(bduss string) {
 	a.setBduss(bduss)
 	a.getList().parseListResp()

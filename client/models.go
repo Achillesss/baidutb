@@ -1,9 +1,5 @@
 package client
 
-import (
-	"encoding/xml"
-)
-
 type agent struct {
 	tiebaConf
 	tiebaBody
@@ -26,53 +22,7 @@ type tiebaBody struct {
 	Tbs   string `json:"tbs"`
 	Sign  string `json:"sign"`
 }
-type Div struct {
-	XMLName xml.Name `xml:"div"`
-	A       string   `xml:"a"`
-}
-type meta struct {
-	Name      string `xml:"name,attr"`
-	HttpEquiv string `xml:"http_equiv"`
-	Content   string `xml:"content,attr"`
-}
-type head struct {
-	Metas []meta `xml:"meta"`
-	Style string `xml:"style"`
-	Title string `xml:"title"`
-}
 
-type a struct {
-	Href  string `xml:"href"`
-	Value string `xml:"a"`
-}
-
-type tr struct {
-	Class string `xml:"class,attr"`
-}
-
-type tbody struct {
-	Tr tr `xml:"tr"`
-}
-type table struct {
-	Class string `xml:"class,attr"`
-	Body  tbody  `xml:"tbody"`
-}
-type div struct {
-	Class string `xml:"class,attr"`
-	Value table  `xml:"table"`
-	A     a      `xml:"a"`
-}
-type divSpace struct {
-	Divs []div `xml:"div"`
-}
-type body struct {
-	DivSpace divSpace `xml:"div"`
-}
-type listRes struct {
-	XMLName xml.Name `xml:"html"`
-	Head    head     `xml:"head"`
-	Body    body     `xml:"body"`
-}
 type fidData struct {
 	Fid         int32 `json:"fid"`
 	CanSendPics int32 `json:"can_send_pics"`
