@@ -2,16 +2,19 @@ package client
 
 import (
 	"encoding/json"
+	"time"
 
 	"fmt"
 
 	"crypto/md5"
+	"encoding/xml"
 
 	"github.com/achillesss/baidutb/config"
 	"github.com/achillesss/log"
 )
 
 func (a *agent) configurate(c *config.C) *agent {
+	a.tiebaConf.ListURL = c.ListURL
 	a.tiebaConf.fidURL = c.FidURL
 	a.tiebaConf.SignURL = c.SignURL
 	a.tiebaConf.tbsURL = c.TbsURL
@@ -28,6 +31,8 @@ func (a *agent) checkConf() *agent {
 	switch {
 	case a == nil:
 		a.err = fmt.Errorf("nil agent")
+	case a.ListURL == "":
+		a.err = fmt.Errorf("nil list url")
 	case a.fidURL == "":
 		a.err = fmt.Errorf("nil fid url")
 	case a.tbsURL == "":
@@ -51,7 +56,14 @@ func (a *agent) checkResp() *agent {
 
 	return a
 }
-
+func (a *agent) parseListResp() *agent {
+	l := new(listRes)
+	if a.err = xml.Unmarshal(a.apiResp, l); a.err == nil {
+		a.apiResp = nil
+	}
+	log.Printf("list: %#v\n", l)
+	return a.log()
+}
 func (a *agent) parseTbsResp() *agent {
 	if a.err == nil {
 		t := new(tbsRes)
@@ -95,4 +107,8 @@ func (a *agent) canSign() bool {
 func (a *agent) sign() *agent {
 	a.Sign = fmt.Sprintf("%X", md5.Sum([]byte(fmt.Sprintf("BDUSS=%sfid=%skw=%stbs=%stiebaclient!!!", a.Bduss, a.Fid, a.Kw, a.Tbs))))
 	return a
+}
+
+func tomorrow(now time.Time) time.Time {
+	return time.Date(now.Year(), now.Month(), now.Day()+1, 0, 0, 0, 500000000, now.Location())
 }

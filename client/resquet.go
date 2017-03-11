@@ -23,6 +23,10 @@ func (a *agent) get(url string) *agent {
 	}
 	return a
 }
+
+func (a *agent) getList() *agent {
+	return a.get(a.ListURL).checkResp().log()
+}
 func (a *agent) getTbs() *agent {
 	return a.get(a.tbsURL).checkResp().log()
 }
