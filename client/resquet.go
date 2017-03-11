@@ -55,14 +55,13 @@ func (a *agent) signUp(kw string) time.Time {
 	return t
 }
 
-func (a *agent) signOneTieba(kw string) (res *time.Time) {
+func (a *agent) signOneTieba(kw string) {
 	if a.err == nil {
 		if a.getFid(kw).parseFidResp().getTbs(kw).parseTbsResp().canSign() {
 			now := a.sign(kw).signUp(kw)
-			res = &now
+			timeChan <- &now
 		}
 	}
-	return
 }
 
 func transBdussChan(bdussChan chan<- string, bdussList []string) {
@@ -79,15 +78,14 @@ func transKwChan(kwChan chan<- string, kwList map[string]string) {
 	close(kwChan)
 }
 
-func (a *agent) signOnePerson(bduss string) (res *time.Time) {
+func (a *agent) signOnePerson(bduss string) {
 	a.setBduss(bduss)
 	a.getList().parseListResp()
 	kwChan := make(chan string)
 	go transKwChan(kwChan, a.KwList)
 	for k := range kwChan {
 		go func(kw string) {
-			res = a.signOneTieba(kw)
+			a.signOneTieba(kw)
 		}(k)
 	}
-	return
 }

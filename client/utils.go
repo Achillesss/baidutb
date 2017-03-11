@@ -104,8 +104,6 @@ func (a *agent) canSign() bool {
 			a.err = fmt.Errorf("nil fid")
 		case a.Tbs == "":
 			a.err = fmt.Errorf("nil tbs")
-			// case a.Kw == "":
-			// a.err = fmt.Errorf("nil kw")
 		}
 	}
 	return a.err == nil
