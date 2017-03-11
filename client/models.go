@@ -23,9 +23,8 @@ type tiebaConf struct {
 type tiebaBody struct {
 	Bduss string `json:"BDUSS"`
 	Fid   string `json:"fid"` // tieba id
-	// Kw    string `json:"kw"`  // tieba name
-	Tbs  string `json:"tbs"`
-	Sign string `json:"sign"`
+	Tbs   string `json:"tbs"`
+	Sign  string `json:"sign"`
 }
 type Div struct {
 	XMLName xml.Name `xml:"div"`

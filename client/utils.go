@@ -52,7 +52,7 @@ func (a *agent) checkResp() *agent {
 		a.err = fmt.Errorf("nil reponse body")
 	} else {
 		if a.debug {
-			log.Printf("response: %#v\n", string(a.apiResp))
+			log.Printfln("response: %#v", string(a.apiResp))
 		}
 	}
 
@@ -67,9 +67,7 @@ func (a *agent) parseListResp() *agent {
 		a.KwList[g[i][1]] = time.Now().Format(time.RFC3339)
 	}
 	a.apiResp = nil
-	fmt.Println()
-	log.Printf("user %s tieba list:\n%s", a.Bduss, a.KwList)
-	fmt.Println()
+	log.Printfln("user %s tieba list:\t%s", a.Bduss, a.KwList)
 	return a
 }
 func (a *agent) parseTbsResp() *agent {

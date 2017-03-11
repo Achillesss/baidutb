@@ -15,7 +15,7 @@ func (a *agent) get(url, kw string) *agent {
 		r := req.New().CustomMethod("GET", url).Set("Cookie", fmt.Sprintf("BDUSS=%s", a.Bduss)).Param("fname", kw)
 		if a.debug {
 			s, _ := r.AsCurlCommand()
-			log.Printf("[curl] %s", s)
+			log.Printfln("[curl] %s", s)
 		}
 		_, a.apiResp, _ = r.EndBytes()
 	}
@@ -50,8 +50,9 @@ func (a *agent) signUp(kw string) time.Time {
 	if res.ErrMsg != "" {
 		desc = res.ErrMsg
 	}
-	log.Printf("sign %q end.Resp: %#v", kw, desc)
-	return time.Unix(res.Time, 0)
+	t := time.Unix(res.Time, 0)
+	log.Printfln("sign %q end.Resp: %#v Time: %s", kw, desc, t.Format(time.RFC3339))
+	return t
 }
 
 func (a *agent) signOneTieba(kw string) (res *time.Time) {
@@ -59,7 +60,6 @@ func (a *agent) signOneTieba(kw string) (res *time.Time) {
 		if a.getFid(kw).parseFidResp().getTbs(kw).parseTbsResp().canSign() {
 			now := a.sign(kw).signUp(kw)
 			res = &now
-			fmt.Printf("Time: %s\n", now.Format(time.RFC3339))
 		}
 	}
 	return

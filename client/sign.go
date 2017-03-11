@@ -1,10 +1,10 @@
 package client
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/achillesss/baidutb/config"
+	"github.com/achillesss/log"
 )
 
 func Start(path string) {
@@ -18,13 +18,12 @@ func Start(path string) {
 			go func(bduss string) {
 				a := new(agent)
 				a.configurate(c).checkConf().log()
-				fmt.Printf("\nSigning %s\n", bduss)
 				signTime = a.signOnePerson(bduss)
 			}(b)
 		}
 		time.Sleep(time.Second)
 		for i := 3; i > 0; i-- {
-			fmt.Printf("Signing in %d seoncd...\n", i)
+			log.Printfln("Signing in %d seoncd...", i)
 			time.Sleep(time.Second)
 		}
 		if signTime == nil {
@@ -32,7 +31,7 @@ func Start(path string) {
 			signTime = &t
 		}
 		sleepTime := tomorrow(*signTime).Sub(*signTime)
-		fmt.Printf("Today's signing ended at %s. tomorrow's signing begins at%s. sleep time: %v s", signTime.Format(time.RFC3339), tomorrow(*signTime), sleepTime.Seconds())
+		log.Printfln("Today's signing ended at %s. tomorrow's signing begins at%s. sleep time: %v s", signTime.Format(time.RFC3339), tomorrow(*signTime), sleepTime.Seconds())
 		time.Sleep(sleepTime)
 	}
 }
