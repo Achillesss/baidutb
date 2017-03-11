@@ -11,26 +11,21 @@ func Start(path string) {
 	for {
 		c := new(config.C)
 		c.Decode(path)
-		a := new(agent)
-		a.configurate(c).checkConf().log()
 		var signTime *time.Time
-		for _, b := range a.BdussList {
-			fmt.Printf("\nSigning %s\n", b)
-			a.setBduss(b)
-			a.getList().parseListResp()
-			for k := range a.KwList {
-				fmt.Printf("\n")
-				a.Kw = k
-				if a.err == nil {
-					if a.getFid().parseFidResp().getTbs().parseTbsResp().canSign() {
-						now := a.sign().signUp()
-						if signTime == nil {
-							signTime = &now
-						}
-						fmt.Printf("Time: %s\n", now.Format(time.RFC3339))
-					}
-				}
-			}
+		bdussChan := make(chan string)
+		go transBdussChan(bdussChan, c.BdussList)
+		for b := range bdussChan {
+			go func(bduss string) {
+				a := new(agent)
+				a.configurate(c).checkConf().log()
+				fmt.Printf("\nSigning %s\n", bduss)
+				signTime = a.signOnePerson(bduss)
+			}(b)
+		}
+		time.Sleep(time.Second)
+		for i := 3; i > 0; i-- {
+			fmt.Printf("Signing in %d seoncd...\n", i)
+			time.Sleep(time.Second)
 		}
 		if signTime == nil {
 			t := time.Now()

@@ -68,7 +68,8 @@ func (a *agent) parseListResp() *agent {
 	}
 	a.apiResp = nil
 	fmt.Println()
-	log.Printf("Update my tieba to %s", a.KwList)
+	log.Printf("user %s tieba list:\n%s", a.Bduss, a.KwList)
+	fmt.Println()
 	return a
 }
 func (a *agent) parseTbsResp() *agent {
@@ -105,14 +106,14 @@ func (a *agent) canSign() bool {
 			a.err = fmt.Errorf("nil fid")
 		case a.Tbs == "":
 			a.err = fmt.Errorf("nil tbs")
-		case a.Kw == "":
-			a.err = fmt.Errorf("nil kw")
+			// case a.Kw == "":
+			// a.err = fmt.Errorf("nil kw")
 		}
 	}
 	return a.err == nil
 }
-func (a *agent) sign() *agent {
-	a.Sign = fmt.Sprintf("%X", md5.Sum([]byte(fmt.Sprintf("BDUSS=%sfid=%skw=%stbs=%stiebaclient!!!", a.Bduss, a.Fid, a.Kw, a.Tbs))))
+func (a *agent) sign(kw string) *agent {
+	a.Sign = fmt.Sprintf("%X", md5.Sum([]byte(fmt.Sprintf("BDUSS=%sfid=%skw=%stbs=%stiebaclient!!!", a.Bduss, a.Fid, kw, a.Tbs))))
 	return a
 }
 

@@ -10,9 +10,9 @@ import (
 	req "github.com/parnurzeal/gorequest"
 )
 
-func (a *agent) get(url string) *agent {
+func (a *agent) get(url, kw string) *agent {
 	if a.err == nil {
-		r := req.New().CustomMethod("GET", url).Set("Cookie", fmt.Sprintf("BDUSS=%s", a.Bduss)).Param("fname", a.Kw)
+		r := req.New().CustomMethod("GET", url).Set("Cookie", fmt.Sprintf("BDUSS=%s", a.Bduss)).Param("fname", kw)
 		if a.debug {
 			s, _ := r.AsCurlCommand()
 			log.Printf("[curl] %s", s)
@@ -23,24 +23,24 @@ func (a *agent) get(url string) *agent {
 }
 
 func (a *agent) getList() *agent {
-	return a.get(a.ListURL).checkResp().log()
+	return a.get(a.ListURL, "").checkResp().log()
 }
-func (a *agent) getTbs() *agent {
-	return a.get(a.tbsURL).checkResp().log()
-}
-
-func (a *agent) getFid() *agent {
-	return a.get(a.fidURL).checkResp().log()
+func (a *agent) getTbs(kw string) *agent {
+	return a.get(a.tbsURL, kw).checkResp().log()
 }
 
-func (a *agent) signUp() time.Time {
+func (a *agent) getFid(kw string) *agent {
+	return a.get(a.fidURL, kw).checkResp().log()
+}
+
+func (a *agent) signUp(kw string) time.Time {
 	_, a.apiResp, _ = req.New().
 		CustomMethod("POST", a.SignURL).
 		Set("Content-Type", "urlencoded").
 		Set("Cookie", fmt.Sprintf("BDUSS=%s", a.Bduss)).
 		Param("BDUSS", a.Bduss).
 		Param("fid", a.Fid).
-		Param("kw", a.Kw).
+		Param("kw", kw).
 		Param("tbs", a.Tbs).
 		Param("sign", a.Sign).
 		EndBytes()
@@ -50,6 +50,44 @@ func (a *agent) signUp() time.Time {
 	if res.ErrMsg != "" {
 		desc = res.ErrMsg
 	}
-	log.Printf("sign %q end.Resp: %#v", a.Kw, desc)
+	log.Printf("sign %q end.Resp: %#v", kw, desc)
 	return time.Unix(res.Time, 0)
+}
+
+func (a *agent) signOneTieba(kw string) (res *time.Time) {
+	if a.err == nil {
+		if a.getFid(kw).parseFidResp().getTbs(kw).parseTbsResp().canSign() {
+			now := a.sign(kw).signUp(kw)
+			res = &now
+			fmt.Printf("Time: %s\n", now.Format(time.RFC3339))
+		}
+	}
+	return
+}
+
+func transBdussChan(bdussChan chan<- string, bdussList []string) {
+	for _, b := range bdussList {
+		bdussChan <- b
+	}
+	close(bdussChan)
+}
+
+func transKwChan(kwChan chan<- string, kwList map[string]string) {
+	for k := range kwList {
+		kwChan <- k
+	}
+	close(kwChan)
+}
+
+func (a *agent) signOnePerson(bduss string) (res *time.Time) {
+	a.setBduss(bduss)
+	a.getList().parseListResp()
+	kwChan := make(chan string)
+	go transKwChan(kwChan, a.KwList)
+	for k := range kwChan {
+		go func(kw string) {
+			res = a.signOneTieba(kw)
+		}(k)
+	}
+	return
 }
