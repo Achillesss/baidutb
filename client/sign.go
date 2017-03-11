@@ -33,9 +33,12 @@ func Start(path string) {
 				}
 			}
 		}
+		if signTime == nil {
+			t := time.Now()
+			signTime = &t
+		}
 		sleepTime := tomorrow(*signTime).Sub(*signTime)
 		fmt.Printf("Today's signing ended at %s. tomorrow's signing begins at%s. sleep time: %v s", signTime.Format(time.RFC3339), tomorrow(*signTime), sleepTime.Seconds())
-		a.getList().parseListResp()
 		time.Sleep(sleepTime)
 	}
 }
