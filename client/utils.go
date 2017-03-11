@@ -2,12 +2,12 @@ package client
 
 import (
 	"encoding/json"
+	"regexp"
 	"time"
 
 	"fmt"
 
 	"crypto/md5"
-	"encoding/xml"
 
 	"github.com/achillesss/baidutb/config"
 	"github.com/achillesss/log"
@@ -56,13 +56,18 @@ func (a *agent) checkResp() *agent {
 
 	return a
 }
+
 func (a *agent) parseListResp() *agent {
-	l := new(listRes)
-	if a.err = xml.Unmarshal(a.apiResp, l); a.err == nil {
-		a.apiResp = nil
+	r := regexp.MustCompile(`\d+\.[<][a]\s\w+[=][[:ascii:]]+[>](\S+|[[:word:]+])[<]\/[a][>]`)
+	g := r.FindAllStringSubmatch(string(a.apiResp), -1)
+	a.KwList = make(map[string]string)
+	for i := range g {
+		a.KwList[g[i][1]] = time.Now().Format(time.RFC3339)
 	}
-	log.Printf("list: %#v\n", l)
-	return a.log()
+	a.apiResp = nil
+	fmt.Println()
+	log.Printf("Update my tieba to %s", a.KwList)
+	return a
 }
 func (a *agent) parseTbsResp() *agent {
 	if a.err == nil {

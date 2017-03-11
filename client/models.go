@@ -17,6 +17,7 @@ type tiebaConf struct {
 	tbsURL  string
 	SignURL string
 	ListURL string
+	KwList  map[string]string
 }
 type tiebaBody struct {
 	Bduss string `json:"BDUSS"`
@@ -39,13 +40,16 @@ type head struct {
 	Style string `xml:"style"`
 	Title string `xml:"title"`
 }
+
 type a struct {
 	Href  string `xml:"href"`
 	Value string `xml:"a"`
 }
+
 type tr struct {
 	Class string `xml:"class,attr"`
 }
+
 type tbody struct {
 	Tr tr `xml:"tr"`
 }
