@@ -2,9 +2,7 @@ package client
 
 import (
 	"crypto/md5"
-	"encoding/json"
 	"fmt"
-	"regexp"
 	"time"
 
 	"github.com/achillesss/baidutb/config"
@@ -12,15 +10,15 @@ import (
 )
 
 func (a *agent) setBduss(bduss string) *agent {
-	a.tiebaBody.Bduss = bduss
+	a.params["bduss"] = bduss
 	return a
 }
 func (a *agent) configurate(c *config.C) *agent {
-	a.tiebaConf.ListURL = c.ListURL
+	a.tiebaConf.listURL = c.ListURL
 	a.tiebaConf.fidURL = c.FidURL
-	a.tiebaConf.SignURL = c.SignURL
+	a.tiebaConf.signURL = c.SignURL
 	a.tiebaConf.tbsURL = c.TbsURL
-	a.tiebaConf.BdussList = c.BdussList
+	a.tiebaConf.bdussList = c.BdussList
 	return a
 }
 
@@ -33,76 +31,30 @@ func (a *agent) checkConf() *agent {
 	switch {
 	case a == nil:
 		a.err = fmt.Errorf("nil agent")
-	case a.ListURL == "":
+	case a.listURL == "":
 		a.err = fmt.Errorf("nil list url")
 	case a.fidURL == "":
 		a.err = fmt.Errorf("nil fid url")
 	case a.tbsURL == "":
 		a.err = fmt.Errorf("nil tbs url")
-	case a.SignURL == "":
+	case a.signURL == "":
 		a.err = fmt.Errorf("nil sign url")
-	case a.BdussList == nil:
+	case a.bdussList == nil:
 		a.err = fmt.Errorf("nil bduss list")
 	}
 	return a
 }
 
-func (a *agent) checkResp() *agent {
-	if a.apiResp == nil {
-		a.err = fmt.Errorf("nil reponse body")
+func (a *agent) ok() bool {
+	if a.params["bduss"] != "" && a.params["fid"] != "" && a.params["tbs"] != "" {
+		a.err = nil
 	} else {
-		if a.debug {
-			log.Printfln("response: %#v", string(a.apiResp))
-		}
-	}
-
-	return a
-}
-
-func (a *agent) parseListResp() *agent {
-	r := regexp.MustCompile(`\d+\.[<][a]\s\w+[=][[:ascii:]]+[>](\S+|[[:word:]+])[<]\/[a][>]`)
-	g := r.FindAllStringSubmatch(string(a.apiResp), -1)
-	a.KwList = make(map[string]string)
-	for i := range g {
-		a.KwList[g[i][1]] = time.Now().Format(time.RFC3339)
-	}
-	a.apiResp = nil
-	log.Printfln("user %s tieba list:\t%s", a.Bduss, a.KwList)
-	return a
-}
-func (a *agent) parseTbsResp() *agent {
-	if a.err == nil {
-		t := new(tbsRes)
-		if a.err = json.Unmarshal(a.apiResp, t); a.err == nil {
-			a.Tbs = t.Tbs
-			a.apiResp = nil
-		}
-	}
-	return a.log()
-}
-func (a *agent) parseFidResp() *agent {
-	if a.err == nil {
-		f := new(fidRes)
-		if a.err = json.Unmarshal(a.apiResp, f); a.err == nil {
-			if f.Data != nil {
-				a.Fid = fmt.Sprintf("%d", f.Data.Fid)
-				a.apiResp = nil
-			} else {
-				a.err = fmt.Errorf("nil fid data")
-			}
-		}
-	}
-	return a.log()
-}
-
-func (a *agent) canSign() bool {
-	if a.err == nil {
 		switch {
-		case a.Bduss == "":
+		case a.params["bduss"] == "":
 			a.err = fmt.Errorf("nil bduss")
-		case a.Fid == "":
+		case a.params["fid"] == "":
 			a.err = fmt.Errorf("nil fid")
-		case a.Tbs == "":
+		case a.params["tbs"] == "":
 			a.err = fmt.Errorf("nil tbs")
 		}
 	}
@@ -110,24 +62,25 @@ func (a *agent) canSign() bool {
 }
 
 func (a *agent) sign(kw string) *agent {
-	a.Sign = fmt.Sprintf("%X", md5.Sum([]byte(fmt.Sprintf("BDUSS=%sfid=%skw=%stbs=%stiebaclient!!!", a.Bduss, a.Fid, kw, a.Tbs))))
+	a.params["sign"] = fmt.Sprintf("%X", md5.Sum([]byte(fmt.Sprintf("BDUSS=%sfid=%skw=%stbs=%stiebaclient!!!", a.params["bduss"], a.params["fid"], kw, a.params["tbs"]))))
 	return a
 }
 
 func tomorrow(now time.Time) time.Time {
-	return time.Date(now.Year(), now.Month(), now.Day()+1, 0, 0, 0, 500000000, now.Location())
+	return today(now).AddDate(0, 0, 1).Add(time.Millisecond * 500)
+}
+func today(now time.Time) time.Time {
+	return time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
 }
 
-func transBdussChan(bdussChan chan<- string, bdussList []string) {
-	for _, b := range bdussList {
-		bdussChan <- b
+func countDown() {
+	time.Sleep(time.Second)
+	for i := 3; i > 0; i-- {
+		second := "seconds"
+		if i == 1 {
+			second = "second"
+		}
+		log.Printfln("Signing will end in %d %s...", i, second)
+		time.Sleep(time.Second)
 	}
-	close(bdussChan)
-}
-
-func transKwChan(kwChan chan<- string, kwList map[string]string) {
-	for k := range kwList {
-		kwChan <- k
-	}
-	close(kwChan)
 }
