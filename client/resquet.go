@@ -131,7 +131,6 @@ func (a *agent) signByKw(kwChan <-chan string) {
 }
 
 func signOnePerson(bduss string, conf *config.C) {
-	log.Printfln("%s", log.FuncName())
 	a := new(agent)
 	a.configurate(conf)
 	a.params = make(map[string]string)
