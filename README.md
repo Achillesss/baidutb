@@ -1,2 +1,3 @@
-#baidutb
-for baidu tieba signing
+# 百度贴吧签到程序
+## 你，值得拥有
+###### 抱歉，配置信息没有上传，以防被人乱用
