@@ -17,7 +17,7 @@ func get(url, bduss, kw string) (res []byte) {
 	_, res, _ = r.EndBytes()
 	if debug {
 		s, _ := r.AsCurlCommand()
-		log.Printfln("[CURL] %s", s)
+		log.Infofln("[CURL] %s", s)
 	}
 
 	return
@@ -88,7 +88,7 @@ func (a *agent) signUp(kw string) time.Time {
 		desc = res.ErrMsg
 	}
 	t := time.Unix(res.Time, 0)
-	log.Printfln("Sign %q end. Resp: %#v Time: %s", kw, desc, t.Format(time.RFC3339))
+	log.Infofln("Sign %q end. Resp: %#v Time: %s", kw, desc, t.Format(time.RFC3339))
 	return t
 }
 

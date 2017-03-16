@@ -23,7 +23,8 @@ func (a *agent) configurate(c *config.C) *agent {
 }
 
 func (a *agent) log() *agent {
-	log.Logn(a.err == nil, fmt.Sprintf("%v", log.FErrorN(a.err, 1)), 1)
+	log.FmtErrN(1, &a.err)
+	log.Ln(a.err == nil, fmt.Sprintf("%#v", a.err), 1)
 	return a
 }
 
@@ -80,7 +81,7 @@ func countDown() {
 		if i == 1 {
 			second = "second"
 		}
-		log.Printfln("Signing will end in %d %s...", i, second)
+		log.Infofln("Signing will end in %d %s...", i, second)
 		time.Sleep(time.Second)
 	}
 }
