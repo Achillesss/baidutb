@@ -15,11 +15,10 @@ import (
 func get(url, bduss, kw string) (res []byte) {
 	r := req.New().CustomMethod("GET", url).Set("Cookie", fmt.Sprintf("BDUSS=%s", bduss)).Param("fname", kw)
 	_, res, _ = r.EndBytes()
-	if debug {
+	if *debug {
 		s, _ := r.AsCurlCommand()
-		log.Infofln("[CURL] %s", s)
+		log.Infofln("%s", s)
 	}
-
 	return
 }
 
@@ -30,7 +29,6 @@ func parseListResp(resp []byte) (kwList []string) {
 		for i := range g {
 			kwList = append(kwList, g[i][1])
 		}
-		// log.Printfln("User %s tieba list:\t%s", a.params["bduss"], kwList)
 	}
 	return
 }
@@ -66,11 +64,12 @@ func (a *agent) parseFidResp(resp []byte) *agent {
 	}
 	return a
 }
+
 func (a *agent) getFid(kw string) []byte {
 	return get(a.fidURL, a.params["bduss"], kw)
 }
 
-func (a *agent) signUp(kw string) time.Time {
+func (a *agent) signUp(kw string) {
 	_, resp, _ := req.New().
 		CustomMethod("POST", a.signURL).
 		Set("Content-Type", "urlencoded").
@@ -89,7 +88,6 @@ func (a *agent) signUp(kw string) time.Time {
 	}
 	t := time.Unix(res.Time, 0)
 	log.Infofln("Sign %q end. Resp: %#v Time: %s", kw, desc, t.Format(time.RFC3339))
-	return t
 }
 
 func transBdussChan(bdussChan chan<- string, bdussList []string) {
@@ -110,7 +108,7 @@ func startToSign(bduss, kw string, conf *config.C) {
 	a := new(agent)
 	a.params = make(map[string]string)
 	if a.configurate(conf).setBduss(bduss).parseTbsResp(a.getTbs()).parseFidResp(a.getFid(kw)).ok() {
-		signingTimeSlice = append(signingTimeSlice, a.sign(kw).signUp(kw))
+		a.sign(kw).signUp(kw)
 	}
 	a.log()
 }
@@ -125,6 +123,7 @@ func signByKw(bduss string, kwChan <-chan string, conf *config.C) {
 
 func signOnePerson(bduss string, conf *config.C) {
 	kwList := parseListResp(getList(bduss, conf))
+	log.Infofln("User %s tieba list:\t%s", bduss, kwList)
 	kwChan := make(chan string)
 	go transKw(kwChan, kwList)
 	signByKw(bduss, kwChan, conf)
@@ -133,9 +132,7 @@ func signOnePerson(bduss string, conf *config.C) {
 func signByBDUSS(bdussChan <-chan string, conf *config.C) (res map[string]bool) {
 	res = make(map[string]bool)
 	for b := range bdussChan {
-		go func(bduss string) {
-			signOnePerson(bduss, conf)
-		}(b)
+		signOnePerson(b, conf)
 		res[b] = true
 	}
 	return

@@ -76,7 +76,7 @@ func today(now time.Time) time.Time {
 
 func countDown() {
 	time.Sleep(time.Second)
-	for i := 3; i > 0; i-- {
+	for i := 5; i > 0; i-- {
 		second := "seconds"
 		if i == 1 {
 			second = "second"
