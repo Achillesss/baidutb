@@ -104,7 +104,7 @@ func getTopicList(bduss string, conf *config.C) {
 			// 水一个贴
 			log.Infofln("开始水贴：%s", v)
 			replyATopic(bduss, kw, k, conf)
-			time.Sleep(5 * time.Second)
+			time.Sleep(20 * time.Second)
 		}
 	}
 }
