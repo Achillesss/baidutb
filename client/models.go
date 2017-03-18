@@ -22,7 +22,7 @@ type tiebaConf struct {
 
 type tiebaBody struct {
 	params map[string]string // bduss, fid, tbs, sign
-	kwList map[string]string
+	// kwList map[string]string
 }
 
 type fidData struct {

@@ -8,4 +8,5 @@ type C struct {
 	TbsURL     string   `toml:"tbsUrl"`     // get tbs
 	SignURL    string   `toml:"signUrl"`    // sign
 	FDetailURL string   `toml:"fDetailUrl"` // get forum detail
+	ReplyURL   string   `toml:"replyUrl"`   // url for posting a reply
 }
