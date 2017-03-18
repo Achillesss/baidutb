@@ -9,16 +9,13 @@ import (
 	"github.com/achillesss/log"
 )
 
-func (a *agent) setBduss(bduss string) *agent {
-	a.params["bduss"] = bduss
-	return a
-}
 func (a *agent) configurate(c *config.C) *agent {
 	a.tiebaConf.listURL = c.ListURL
 	a.tiebaConf.fidURL = c.FidURL
 	a.tiebaConf.signURL = c.SignURL
 	a.tiebaConf.tbsURL = c.TbsURL
 	a.tiebaConf.bdussList = c.BdussList
+	a.tiebaConf.fDetailURL = c.FDetailURL
 	return a
 }
 

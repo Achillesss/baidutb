@@ -5,16 +5,19 @@ import "github.com/parnurzeal/gorequest"
 type agent struct {
 	tiebaConf
 	tiebaBody
-	err error
-	req *gorequest.SuperAgent
+	err   error
+	bduss string
+	kw    string
+	req   *gorequest.SuperAgent
 }
 
 type tiebaConf struct {
-	fidURL    string
-	tbsURL    string
-	signURL   string
-	listURL   string
-	bdussList []string
+	fidURL     string
+	tbsURL     string
+	signURL    string
+	listURL    string
+	fDetailURL string
+	bdussList  []string
 }
 
 type tiebaBody struct {
