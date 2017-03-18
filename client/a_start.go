@@ -32,8 +32,8 @@ func autoReply(path string) {
 	for {
 		zone := time.FixedZone("BeiJing", 8*3600)
 		now := time.Now().In(zone)
-		start := today(now).Add(2 * time.Hour)
-		end := start.Add(6 * time.Hour)
+		start := today(now).Add(1 * time.Hour)
+		end := start.Add(7 * time.Hour)
 		if now.After(end) {
 			start = start.AddDate(0, 0, 1)
 			end = end.AddDate(0, 0, 1)
@@ -47,7 +47,9 @@ func autoReply(path string) {
 			log.Infofln("config: %#v\n", c)
 		}
 		for _, bduss := range c.BdussList {
-			getTopicList(bduss, c)
+			go func(b string) {
+				getTopicList(b, c)
+			}(bduss)
 		}
 		time.Sleep(time.Hour * 2)
 	}

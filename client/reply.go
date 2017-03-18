@@ -28,7 +28,7 @@ func (a *agent) setContent(content string) *agent {
 func (a *agent) reply(conf *config.C) (res []byte) {
 	client := new(http.Client)
 	body := make(url.Values)
-	content := strings.Replace(a.params["content"], "{{kw}}", a.params["bduss"], -1)
+	content := strings.Replace(a.params["content"], "{{kw}}", a.params["kw"], -1)
 	body.Set("content", content)
 	body.Add("fid", a.params["fid"])
 	body.Add("kw", a.params["kw"])
