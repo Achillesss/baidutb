@@ -6,18 +6,19 @@ type agent struct {
 	tiebaConf
 	params map[string]string // bduss, fid, tbs, sign
 	err    error
+	bduss  string
+	kw     string
 	req    *gorequest.SuperAgent
 }
 
 type tiebaConf struct {
-	fidURL    string
-	tbsURL    string
-	signURL   string
-	listURL   string
-	bdussList []string
-}
-
-type tiebaBody struct {
+	fidURL     string
+	tbsURL     string
+	signURL    string
+	listURL    string
+	fDetailURL string
+	replyURL   string
+	bdussList  []string
 }
 
 type fidData struct {
