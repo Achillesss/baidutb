@@ -30,6 +30,17 @@ func Start(path string) {
 
 func autoReply(path string) {
 	for {
+		zone := time.FixedZone("BeiJing", 8*3600)
+		now := time.Now().In(zone)
+		start := today(now).Add(2 * time.Hour)
+		end := start.Add(8 * time.Hour)
+		if now.After(end) {
+			start = start.AddDate(0, 0, 1)
+			end = end.AddDate(0, 0, 1)
+		}
+		sleepTime := time.NewTimer(start.Sub(now)).C
+		log.Infofln("Auto reply start at %s", start.Format(time.RFC3339))
+		<-sleepTime
 		c := new(config.C)
 		c.Decode(path)
 		if *debug {
