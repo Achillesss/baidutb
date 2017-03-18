@@ -3,6 +3,8 @@ package client
 import (
 	"fmt"
 
+	"time"
+
 	"github.com/achillesss/baidutb/config"
 	log "github.com/achillesss/log"
 	req "github.com/parnurzeal/gorequest"
@@ -33,11 +35,10 @@ func (a *agent) setKw(kw string) *agent {
 
 func (a *agent) get(url string) (res []byte) {
 	r := req.New().CustomMethod("GET", url).Set("Cookie", fmt.Sprintf("BDUSS=%s", a.params["bduss"])).Param("fname", a.params["kw"]).Param("kw", a.params["kw"])
-	_, res, _ = r.EndBytes()
 	if *debug {
-		s, _ := r.AsCurlCommand()
-		log.Infofln("%s", s)
+		r.SetCurlCommand(true)
 	}
+	_, res, _ = r.EndBytes()
 	return
 }
 
@@ -90,10 +91,20 @@ func signByBDUSS(bdussChan <-chan string, conf *config.C) (res map[string]bool) 
 }
 
 func getTopicList(bduss string, conf *config.C) {
-	// a := newAgent().setBduss(bduss)
-	// kwList := parseListResp(a.getList(conf))
-
-	b := newAgent().configurate(conf).setBduss(bduss).setKw("全民K歌")
-	topicList := parseTopicListResp(b.getTopicList())
-
+	a := newAgent().setBduss(bduss)
+	kwList := parseListResp(a.getList(conf))
+	log.Infofln("用户：%s贴吧列表：%s", bduss[:10], kwList)
+	for _, kw := range kwList {
+		// 水一个贴吧
+		log.Infofln("贴吧：%s", kw)
+		b := newAgent().configurate(conf).setBduss(bduss).setKw(kw)
+		topicList := parseTopicListResp(b.getTopicList())
+		log.Infofln("帖子列表：%#v", topicList)
+		for k, v := range topicList {
+			// 水一个贴
+			log.Infofln("开始水贴：%s", v)
+			replyATopic(bduss, kw, k, conf)
+			time.Sleep(5 * time.Second)
+		}
+	}
 }

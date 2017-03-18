@@ -59,10 +59,11 @@ import (
 
 */
 // http://tieba.baidu.com/f?kw= Cookie: BDUSS=
-func parseTopicListResp(resp []byte) (topicList []string) {
+func parseTopicListResp(resp []byte) (topic map[string]string) {
 	if resp != nil {
+		topic = make(map[string]string)
 		// <a href="/p/5026842582" title="互听 互评 互花花 ٩(˃̶͈̀௰˂̶͈́)و" target="_blank" class="j_th_tit ">互听 互评 互花花 ٩(˃̶͈̀௰˂̶͈́)و</a>
-		reg := regexp.MustCompile(`(?m:\s+)[<]a\shref="/p/(\d+)"\stitle=(?:.*\s)target=(?:.*\s)class=(?:.*")[>].+[<][[:graph:]][a][>]\r*\n`)
+		reg := regexp.MustCompile(`(?m:\s+)[<]a\shref="/p/(\d+)"\stitle=(?:.*\s)target=(?:.*\s)class=(?:.*")[>](.+)[<][[:graph:]][a][>]\r*\n`)
 		g := reg.FindAllStringSubmatch(string(resp), -1)
 		if *debug {
 			for i := range g {
@@ -70,7 +71,7 @@ func parseTopicListResp(resp []byte) (topicList []string) {
 			}
 		}
 		for i := range g {
-			topicList = append(topicList, g[i][1])
+			topic[g[i][1]] = g[i][2]
 		}
 	}
 	return

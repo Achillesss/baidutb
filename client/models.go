@@ -4,11 +4,11 @@ import "github.com/parnurzeal/gorequest"
 
 type agent struct {
 	tiebaConf
-	tiebaBody
-	err   error
-	bduss string
-	kw    string
-	req   *gorequest.SuperAgent
+	params map[string]string // bduss, fid, tbs, sign
+	err    error
+	bduss  string
+	kw     string
+	req    *gorequest.SuperAgent
 }
 
 type tiebaConf struct {
@@ -17,12 +17,8 @@ type tiebaConf struct {
 	signURL    string
 	listURL    string
 	fDetailURL string
+	replyURL   string
 	bdussList  []string
-}
-
-type tiebaBody struct {
-	params map[string]string // bduss, fid, tbs, sign
-	// kwList map[string]string
 }
 
 type fidData struct {
