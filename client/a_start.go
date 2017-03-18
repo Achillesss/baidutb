@@ -33,7 +33,7 @@ func autoReply(path string) {
 		zone := time.FixedZone("BeiJing", 8*3600)
 		now := time.Now().In(zone)
 		start := today(now).Add(2 * time.Hour)
-		end := start.Add(8 * time.Hour)
+		end := start.Add(6 * time.Hour)
 		if now.After(end) {
 			start = start.AddDate(0, 0, 1)
 			end = end.AddDate(0, 0, 1)
