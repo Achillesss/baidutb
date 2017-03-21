@@ -50,17 +50,20 @@ func (a *agent) reply(conf *config.C) (res []byte) {
 	request.Header.Add("User-Agent", "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0")
 	request.Header.Add("X-Requested-With", "XMLHttpRequest")
 
-	resp, _ := client.Do(request)
-	res, _ = ioutil.ReadAll(resp.Body)
+	resp, err := client.Do(request)
+	if resp != nil {
+		res, _ = ioutil.ReadAll(resp.Body)
+	} else if err != nil {
+		res, _ = ioutil.ReadAll(strings.NewReader(err.Error()))
+	}
 	return
 }
 
-func replyATopic(bduss, kw, tid string, conf *config.C) {
+func replyATopic(bduss, kw, tid string, conf *config.C) (res string) {
 	a := newAgent().configurate(conf)
 	if a.setBduss(bduss).setKw(kw).parseFidResp(a.getFid()).parseTbsResp(a.getTbs()).setTid(tid).setContent(conf.Content).ok() {
 		resp := a.reply(conf)
-		if *debug {
-			log.Infofln("reply response: %s\n", string(resp))
-		}
+		res = string(resp)
 	}
+	return
 }

@@ -32,11 +32,9 @@ func autoReply(path string) {
 	for {
 		zone := time.FixedZone("BeiJing", 8*3600)
 		now := time.Now().In(zone)
-		start := today(now).Add(1 * time.Hour)
-		end := start.Add(7 * time.Hour)
-		if now.After(end) {
+		start := today(now).Add(time.Hour * 3)
+		if now.After(start) {
 			start = start.AddDate(0, 0, 1)
-			end = end.AddDate(0, 0, 1)
 		}
 		sleepTime := time.NewTimer(start.Sub(now)).C
 		log.Infofln("Auto reply start at %s", start.Format(time.RFC3339))
@@ -51,6 +49,5 @@ func autoReply(path string) {
 				getTopicList(b, c)
 			}(bduss)
 		}
-		time.Sleep(time.Hour * 2)
 	}
 }

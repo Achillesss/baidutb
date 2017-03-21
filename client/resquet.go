@@ -5,6 +5,8 @@ import (
 
 	"time"
 
+	"strings"
+
 	"github.com/achillesss/baidutb/config"
 	log "github.com/achillesss/log"
 	req "github.com/parnurzeal/gorequest"
@@ -93,18 +95,25 @@ func signByBDUSS(bdussChan <-chan string, conf *config.C) (res map[string]bool) 
 func getTopicList(bduss string, conf *config.C) {
 	a := newAgent().setBduss(bduss)
 	kwList := parseListResp(a.getList(conf))
-	log.Infofln("用户：%s贴吧列表：%s", bduss[:10], kwList)
+	// 弱智,ufo
 	for _, kw := range kwList {
-		// 水一个贴吧
-		log.Infofln("贴吧：%s", kw)
-		b := newAgent().configurate(conf).setBduss(bduss).setKw(kw)
-		topicList := parseTopicListResp(b.getTopicList())
-		log.Infofln("帖子列表：%#v", topicList)
-		for k, v := range topicList {
-			// 水一个贴
-			log.Infofln("开始水贴：%s", v)
-			replyATopic(bduss, kw, k, conf)
-			time.Sleep(20 * time.Second)
-		}
+		go func(fName string) {
+			b := newAgent().configurate(conf).setBduss(bduss).setKw(fName)
+			topicList := parseTopicListResp(b.getTopicList())
+			// log.Infofln("帖子列表：%#v", topicList)
+		topic:
+			for k, v := range topicList {
+				// 水一个贴，帖子名包含"吧规"的不水
+				unReply := []string{"吧规", "禁止水", "精品", "置顶"}
+				for _, u := range unReply {
+					if strings.Contains(v, u) {
+						continue topic
+					}
+				}
+				resp := replyATopic(bduss, fName, k, conf)
+				log.Infofln("用户%q在贴吧%q水贴：%s\t结果：%#v", bduss[:10], fName, v, resp)
+				time.Sleep(2 * time.Second)
+			}
+		}(kw)
 	}
 }

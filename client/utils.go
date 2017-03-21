@@ -21,7 +21,7 @@ func (a *agent) configurate(c *config.C) *agent {
 
 func (a *agent) log() *agent {
 	log.FmtErrN(1, &a.err)
-	log.Ln(a.err == nil, fmt.Sprintf("%#v", a.err), 1)
+	log.Lln(a.err != nil, "%#v", a.err)
 	return a
 }
 
@@ -73,7 +73,7 @@ func today(now time.Time) time.Time {
 
 func countDown() {
 	time.Sleep(time.Second)
-	for i := 5; i > 0; i-- {
+	for i := 10; i > 0; i-- {
 		second := "seconds"
 		if i == 1 {
 			second = "second"
